@@ -1,0 +1,24 @@
+# Core Dependencies
+langchain==0.3.7
+langchain-openai==0.2.8
+langchain-community==0.3.5
+langgraph==0.2.45
+langsmith==0.1.143
+
+# Document Processing
+pypdf==4.3.1
+python-docx==1.1.2
+markdown==3.7
+
+# Vector Store
+chromadb==0.5.20
+sentence-transformers==3.3.1
+
+# Utilities
+python-dotenv==1.0.1
+pydantic==2.10.3
+pydantic-settings==2.6.1
+
+# CLI
+rich==13.9.4
+typer==0.15.1
