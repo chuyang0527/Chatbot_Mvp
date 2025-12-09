@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  # Ollama 服务（本地 LLM）
+  ollama:
+    image: ollama/ollama:latest
+    container_name: chatbot-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - chatbot-network
+
+  # 聊天机器人应用
+  chatbot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: chatbot-app
+    depends_on:
+      ollama:
+        condition: service_healthy
+    volumes:
+      - ./data:/app/data
+      - ./chroma_db:/app/chroma_db
+      - ./model:/app/model
+      - ./.env:/app/.env
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - OLLAMA_MODEL=deepseek-r1:7b
+      - LANGCHAIN_TRACING_V2=${LANGCHAIN_TRACING_V2:-false}
+      - LANGCHAIN_API_KEY=${LANGCHAIN_API_KEY:-}
+      - LANGCHAIN_PROJECT=${LANGCHAIN_PROJECT:-chatbot-rag}
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+    networks:
+      - chatbot-network
+
+  # ChromaDB（可选：如果需要独立的向量数据库服务）
+  # chromadb:
+  #   image: chromadb/chroma:latest
+  #   container_name: chatbot-chromadb
+  #   ports:
+  #     - "8001:8000"
+  #   volumes:
+  #     - chroma_data:/chroma/chroma
+  #   environment:
+  #     - IS_PERSISTENT=TRUE
+  #   restart: unless-stopped
+  #   networks:
+  #     - chatbot-network
+
+volumes:
+  ollama_data:
+    driver: local
+  chroma_data:
+    driver: local
+
+networks:
+  chatbot-network:
+    driver: bridge

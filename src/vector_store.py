@@ -20,8 +20,18 @@ class VectorStore:
 
     def __init__(self):
         # 本地 embedding 模型（离线）
+        # 优先使用本地模型，如果不存在则从 HuggingFace 下载
+        local_model_path = Config.BASE_DIR / "model" / "paraphrase-multilingual-MiniLM-L12-v2"
+        
+        if local_model_path.exists():
+            model_name = str(local_model_path)
+            print(f"✓ 使用本地 Embedding 模型: {model_name}")
+        else:
+            model_name = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+            print(f"ℹ 本地模型不存在，将从 HuggingFace 下载: {model_name}")
+        
         self.embeddings = HuggingFaceEmbeddings(
-            model_name=r"E:\work\test\Chatbot_Mvp\model\paraphrase-multilingual-MiniLM-L12-v2",   # <=== 推荐改成配置
+            model_name=model_name,
             model_kwargs={"device": "cpu"},
             encode_kwargs={"normalize_embeddings": True},
         )

@@ -15,6 +15,7 @@ class Config:
     DATA_DIR = BASE_DIR / "data"
     UPLOAD_DIR = DATA_DIR / "uploads"
     VECTOR_DB_DIR = BASE_DIR / "chroma_db"
+    MODEL_DIR = BASE_DIR / "model"
     
     # Ollama 配置
     OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
@@ -41,6 +42,7 @@ class Config:
         """确保必要的目录存在"""
         cls.UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
         cls.VECTOR_DB_DIR.mkdir(parents=True, exist_ok=True)
+        cls.MODEL_DIR.mkdir(parents=True, exist_ok=True)
         
     @classmethod
     def setup_langsmith(cls):
